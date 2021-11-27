@@ -2,12 +2,13 @@
 # -*- coding:utf-8 -*-
 import sys
 import os
+import time
+import logging
 
 libdir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'lib')
 if os.path.exists(libdir):
     sys.path.append(libdir)
 
-import logging
 from waveshare_epd import epd2in13_V2
 from helpers import fonts
 from PIL import Image,ImageDraw
@@ -55,6 +56,10 @@ class NowPlaying:
     self.needs_sleep = True
 
   def update_ui(self, artist: str, title: str, position: int, duration: int):
+    if position == None:
+      position = 0
+    if duration == None:
+      duration = 0
     if artist != self.artist or title != self.title or duration != self.play_duration:
       self.artist = artist
       self.title = title
@@ -81,6 +86,7 @@ class NowPlaying:
         logging.info("Goto Sleep...")
         self.epd.sleep()
         self.needs_sleep = False
+      time.sleep(0.5)
         
   def perform_reset(self):
     logging.info("init and Clear")
@@ -88,11 +94,15 @@ class NowPlaying:
     self.epd.Clear(0xFF)
     
   def render_everything(self):
-    duration = "0:00" # TODO: Calculate this
+    duration = "{:.0f} s".format(self.play_duration) # TODO: Calculate this
 
     (_, font_artist_height) = self.font_artist.getsize(self.artist)
     (track_duration_width, _) = self.font_title.getsize_multiline(self.title)
     (_, track_duration_height) = self.font_duration.getsize(duration)
+
+    # self.time_image.
+    # draw.rectangle((100, 100, 300, 150), fill=(0, 0, 0, 0))
+    self.time_draw.rectangle((0, 0, self.epd.height, self.epd.width), fill = 255)
 
     # Track Artist
     # TODO: If too long, truncate
@@ -122,6 +132,7 @@ class NowPlaying:
     progress_padding = 2
     available_width = self.epd.height - (self.progress_left + (progress_padding * 2) + 1)
 
+    # TODO: if less than previous, we need to draw a rectangle with fill=255 to clear it
     self.time_draw.rectangle((self.progress_left + 2, self.epd.width - 18, self.progress_left + 2 + ((self.play_position / self.play_duration) * available_width), self.epd.width - 3), fill = 0)
 
     logging.debug("next tick...")

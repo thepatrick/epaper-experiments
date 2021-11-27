@@ -11,6 +11,7 @@ appinfo = {
     "display_name": "e-paper experiments",
     "display_version": "1.0.0",
     "publisher": "thepatrick",
+    "email": "noreply@github.com"
 }
 
 # Can be None if you don't yet have a token
@@ -19,36 +20,58 @@ token = open("mytokenfile").read()
 # Take a look at examples/discovery if you want to use discovery.
 server = "10.2.8.10"
 
+logging.info("Create RoonApi...")
 roonapi = RoonApi(appinfo, token, server)
+logging.info("...created.")
+
+logging.info("Write token")
+# save the token for next time
+with open("mytokenfile", "w") as f:
+    f.write(roonapi.token)
+logging.info("Token written")
 
 try:
+  logging.info("NowPlaying()")
   ui = nowplaying.NowPlaying()
+
+  logging.info("start...")
   ui.start()
+
+  my_zone_id = "1601943ba14655923bde8b7420e02f14b13f"
+
+  def update_ui():
+      zone = roonapi.zones[my_zone_id]
+      track = zone['now_playing']['two_line']['line1']
+      artist = zone['now_playing']['two_line']['line2']
+
+      logging.info(zone)
+
+      if "seek_position" in zone:
+        pos = zone['seek_position']
+      elif "now_playing" in zone and "seek_position" in zone["now_playing"]:
+        pos = zone['now_playing']["seek_position"]
+
+      length = zone['now_playing']['length']
+
+      if pos == None or length == None:
+        progress = "0%"
+      else:
+        progress = "{:.1f}%".format(((pos / length) * 100))
+
+      logging.info("[%s (%s)] %s: %s %s" % (zone['display_name'], zone['state'], artist, track, progress))
+
+      ui.update_ui(artist, track, pos, length)
 
   def my_state_callback(event, changed_ids):
     """Call when something changes in roon."""
     print("my_state_callback event:%s changed_ids: %s" % (event, changed_ids))
     for zone_id in changed_ids:
-      zone = roonapi.zones[zone_id]
-
-      if zone_id == '1601943ba14655923bde8b7420e02f14b13f':
-        track = zone['now_playing']['two_line']['line1']
-        artist = zone['now_playing']['two_line']['line2']
-
-        pos = zone['seek_position']
-        length = zone['now_playing']['length']
-
-        if pos == None or length == None:
-          progress = "0%"
-        else:
-          progress = "{:.1f}%".format(((pos / length) * 100))
-
-        print("[%s (%s)] %s: %s %s" % (zone['display_name'], zone['state'], artist, track, progress))
-
-        ui.update_ui(artist, track, pos, length)
+      if zone_id == my_zone_id:
+        update_ui()
 
   # receive state updates in your callback
   roonapi.register_state_callback(my_state_callback)
+  update_ui()
         
 except IOError as e:
     logging.info(e)
@@ -58,16 +81,12 @@ except KeyboardInterrupt:
     ui.ctrl_c()
     exit()
 
-
 # zones_seek_changed
 # zones_changed
 
+logging.info("Begin sleep")
 time.sleep(500)
-
-# save the token for next time
-with open("mytokenfile", "w") as f:
-    f.write(roonapi.token)
-
+logging.info("End sleep")
 
 # 'display_name': 'Schiit', 
 # 'state': 'playing',

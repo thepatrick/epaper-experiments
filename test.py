@@ -2,8 +2,8 @@
 # -*- coding:utf-8 -*-
 import sys
 import os
-picdir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'pic')
-libdir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'lib')
+picdir = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'pic')
+libdir = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'lib')
 if os.path.exists(libdir):
     sys.path.append(libdir)
 
@@ -17,9 +17,6 @@ logging.basicConfig(level=logging.DEBUG)
 
 try:
     logging.info("epd2in13_V2 Demo")
-
-    logging.info(picdir)
-    logging.info(libdir)
     
     epd = epd2in13_V2.EPD()
     logging.info("init and Clear")
@@ -27,79 +24,64 @@ try:
     epd.Clear(0xFF)
 
     # Drawing on the image
-    font_mono_time = ImageFont.truetype(os.path.join(picdir, 'Roboto_Mono', 'static', 'RobotoMono-SemiBold.ttf'), 24)
-    font_thin_15 = ImageFont.truetype(os.path.join(picdir, 'Roboto', 'Roboto-Thin.ttf'), 15)
-    font_reg_24 = ImageFont.truetype(os.path.join(picdir, 'Roboto', 'Roboto-Regular.ttf'), 24)
-    font_med_24 = ImageFont.truetype(os.path.join(picdir, 'Roboto', 'Roboto-Medium.ttf'), 24)
+    font15 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 15)
+    font24 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 24)
     
-    # logging.info("1.Drawing on the image...")
-    # image = Image.new('1', (epd.height, epd.width), 255)  # 255: clear the frame    
-    # draw = ImageDraw.Draw(image)
+    logging.info("1.Drawing on the image...")
+    image = Image.new('1', (epd.height, epd.width), 255)  # 255: clear the frame    
+    draw = ImageDraw.Draw(image)
     
-    # draw.rectangle([(0,0),(50,50)],outline = 0)
-    # draw.rectangle([(55,0),(100,50)],fill = 0)
-    # draw.line([(0,0),(50,50)], fill = 0,width = 1)
-    # draw.line([(0,50),(50,0)], fill = 0,width = 1)
-    # draw.chord((10, 60, 50, 100), 0, 360, fill = 0)
-    # draw.ellipse((55, 60, 95, 100), outline = 0)
-    # draw.pieslice((55, 60, 95, 100), 90, 180, outline = 0)
-    # draw.pieslice((55, 60, 95, 100), 270, 360, fill = 0)
-    # draw.polygon([(110,0),(110,50),(150,25)],outline = 0)
-    # draw.polygon([(190,0),(190,50),(150,25)],fill = 0)
-    # draw.text((120, 60), 'e-Paper demo', font = font15, fill = 0)
-    # draw.text((110, 90), u'微雪电子', font = font24, fill = 0)
-    # epd.display(epd.getbuffer(image))
-    # time.sleep(2)
+    draw.rectangle([(0,0),(50,50)],outline = 0)
+    draw.rectangle([(55,0),(100,50)],fill = 0)
+    draw.line([(0,0),(50,50)], fill = 0,width = 1)
+    draw.line([(0,50),(50,0)], fill = 0,width = 1)
+    draw.chord((10, 60, 50, 100), 0, 360, fill = 0)
+    draw.ellipse((55, 60, 95, 100), outline = 0)
+    draw.pieslice((55, 60, 95, 100), 90, 180, outline = 0)
+    draw.pieslice((55, 60, 95, 100), 270, 360, fill = 0)
+    draw.polygon([(110,0),(110,50),(150,25)],outline = 0)
+    draw.polygon([(190,0),(190,50),(150,25)],fill = 0)
+    draw.text((120, 60), 'e-Paper demo', font = font15, fill = 0)
+    draw.text((110, 90), u'微雪电子', font = font24, fill = 0)
+    epd.display(epd.getbuffer(image))
+    time.sleep(2)
     
     # read bmp file 
-    # logging.info("2.read bmp file...")
-    # image = Image.open(os.path.join(picdir, '2in13.bmp'))
-    # epd.display(epd.getbuffer(image))
-    # time.sleep(2)
+    logging.info("2.read bmp file...")
+    image = Image.open(os.path.join(picdir, '2in13.bmp'))
+    epd.display(epd.getbuffer(image))
+    time.sleep(2)
     
     # read bmp file on window
-    # logging.info("3.read bmp file on window...")
-    # # epd.Clear(0xFF)
-    # image1 = Image.new('1', (epd.height, epd.width), 255)  # 255: clear the frame
-    # bmp = Image.open(os.path.join(picdir, '100x100.bmp'))
-    # image1.paste(bmp, (2,2))    
-    # epd.display(epd.getbuffer(image1))
-    # time.sleep(2)
+    logging.info("3.read bmp file on window...")
+    # epd.Clear(0xFF)
+    image1 = Image.new('1', (epd.height, epd.width), 255)  # 255: clear the frame
+    bmp = Image.open(os.path.join(picdir, '100x100.bmp'))
+    image1.paste(bmp, (2,2))    
+    epd.display(epd.getbuffer(image1))
+    time.sleep(2)
     
     # # partial update
     logging.info("4.show time...")
     time_image = Image.new('1', (epd.height, epd.width), 255)
     time_draw = ImageDraw.Draw(time_image)
-
-    track_artist = "Joshua Radin"
-    track_title = "I'll Be Your Friend"
-
-    (jh_w, jw_h) = font_reg_24.getsize(track_artist)
-
-    time_draw.text((0, 0), track_artist, font = font_reg_24, fill = 0)
-    time_draw.text((0, jw_h), track_title, font = font_med_24, fill = 0)
     
     epd.init(epd.FULL_UPDATE)
     epd.displayPartBaseImage(epd.getbuffer(time_image))
     
     epd.init(epd.PART_UPDATE)
-
-    (time_w, time_h) = font_mono_time.getsize("12:34")
-    time_l = epd.width - time_w
-    time_t = epd.height - time_h
-
     num = 0
     while (True):
-        time_draw.rectangle((time_l, time_t, epd.width, epd.height), fill = 255)
-        time_draw.text((time_l, time_t), time.strftime('%M:%S'), font = font_mono_time, fill = 0)
+        time_draw.rectangle((120, 80, 220, 105), fill = 255)
+        time_draw.text((120, 80), time.strftime('%H:%M:%S'), font = font24, fill = 0)
         epd.displayPartial(epd.getbuffer(time_image))
         num = num + 1
         if(num == 10):
             break
     # epd.Clear(0xFF)
-    # logging.info("Clear...")
-    # epd.init(epd.FULL_UPDATE)
-    # epd.Clear(0xFF)
+    logging.info("Clear...")
+    epd.init(epd.FULL_UPDATE)
+    epd.Clear(0xFF)
     
     logging.info("Goto Sleep...")
     epd.sleep()

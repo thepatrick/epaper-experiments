@@ -27,6 +27,7 @@ try:
     epd.Clear(0xFF)
 
     # Drawing on the image
+    font_mono_time = ImageFont.truetype(os.path.join(picdir, 'Roboto_Mono', 'static', 'RobotoMono-SemiBold.ttf', 24))
     font_thin_15 = ImageFont.truetype(os.path.join(picdir, 'Roboto', 'Roboto-Thin.ttf'), 15)
     font_reg_24 = ImageFont.truetype(os.path.join(picdir, 'Roboto', 'Roboto-Regular.ttf'), 24)
     font_med_24 = ImageFont.truetype(os.path.join(picdir, 'Roboto', 'Roboto-Medium.ttf'), 24)
@@ -83,10 +84,14 @@ try:
     
     epd.init(epd.PART_UPDATE)
 
+    (time_w, time_h) = font_mono_time.getsize("12:34")
+    time_l = epd.width - time_w
+    time_t = epd.height - time_h
+
     num = 0
     while (True):
-        time_draw.rectangle((120, 80, 220, 105), fill = 255)
-        time_draw.text((120, 80), time.strftime('%H:%M:%S'), font = font_thin_15, fill = 0)
+        time_draw.rectangle((time_l, time_t, epd.width, epd.height), fill = 255)
+        time_draw.text((time_l, time_t), time.strftime('%M:%S'), font = font_mono_time, fill = 0)
         epd.displayPartial(epd.getbuffer(time_image))
         num = num + 1
         if(num == 10):

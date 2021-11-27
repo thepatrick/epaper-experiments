@@ -2,8 +2,8 @@
 # -*- coding:utf-8 -*-
 import sys
 import os
-picdir = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'pic')
-libdir = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'lib')
+picdir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'pic')
+libdir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'lib')
 if os.path.exists(libdir):
     sys.path.append(libdir)
 
@@ -17,6 +17,9 @@ logging.basicConfig(level=logging.DEBUG)
 
 try:
     logging.info("epd2in13_V2 Demo")
+
+    logging.info(picdir)
+    logging.info(libdir)
     
     epd = epd2in13_V2.EPD()
     logging.info("init and Clear")

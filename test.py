@@ -27,7 +27,7 @@ try:
     epd.Clear(0xFF)
 
     # Drawing on the image
-    font_mono_time = ImageFont.truetype(os.path.join(picdir, 'Roboto_Mono', 'static', 'RobotoMono-SemiBold.ttf', 24))
+    font_mono_time = ImageFont.truetype(os.path.join(picdir, 'Roboto_Mono', 'static', 'RobotoMono-SemiBold.ttf'), 24)
     font_thin_15 = ImageFont.truetype(os.path.join(picdir, 'Roboto', 'Roboto-Thin.ttf'), 15)
     font_reg_24 = ImageFont.truetype(os.path.join(picdir, 'Roboto', 'Roboto-Regular.ttf'), 24)
     font_med_24 = ImageFont.truetype(os.path.join(picdir, 'Roboto', 'Roboto-Medium.ttf'), 24)

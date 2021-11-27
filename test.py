@@ -27,8 +27,9 @@ try:
     epd.Clear(0xFF)
 
     # Drawing on the image
-    font15 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 15)
-    font24 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 24)
+    font_thin_15 = ImageFont.truetype(os.path.join(picdir, 'Roboto', 'Roboto-Thin.ttf'), 15)
+    font_reg_24 = ImageFont.truetype(os.path.join(picdir, 'Roboto', 'Roboto-Regular.ttf'), 24)
+    font_med_24 = ImageFont.truetype(os.path.join(picdir, 'Roboto', 'Roboto-Medium.ttf'), 24)
     
     # logging.info("1.Drawing on the image...")
     # image = Image.new('1', (epd.height, epd.width), 255)  # 255: clear the frame    
@@ -69,10 +70,13 @@ try:
     time_image = Image.new('1', (epd.height, epd.width), 255)
     time_draw = ImageDraw.Draw(time_image)
 
-    (jh_w, jw_h) = font24.getsize("Joshua Radin")
+    track_artist = "Joshua Radin"
+    track_title = "I'll Be Your Friend"
 
-    time_draw.text((0, 0), "Joshua Radin", font = font24, fill = 0)
-    time_draw.text((0, jw_h), "Some Song Name", font = font24, fill = 0)
+    (jh_w, jw_h) = font_reg_24.getsize(track_artist)
+
+    time_draw.text((0, 0), track_artist, font = font_reg_24, fill = 0)
+    time_draw.text((0, jw_h), track_title, font = font_med_24, fill = 0)
     
     epd.init(epd.FULL_UPDATE)
     epd.displayPartBaseImage(epd.getbuffer(time_image))
@@ -82,7 +86,7 @@ try:
     num = 0
     while (True):
         time_draw.rectangle((120, 80, 220, 105), fill = 255)
-        time_draw.text((120, 80), time.strftime('%H:%M:%S'), font = font24, fill = 0)
+        time_draw.text((120, 80), time.strftime('%H:%M:%S'), font = font_thin_15, fill = 0)
         epd.displayPartial(epd.getbuffer(time_image))
         num = num + 1
         if(num == 10):

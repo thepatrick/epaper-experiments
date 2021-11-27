@@ -73,6 +73,11 @@ try:
     epd.displayPartBaseImage(epd.getbuffer(time_image))
     
     epd.init(epd.PART_UPDATE)
+
+    time_draw.text((0, 0), "Joshua Radin", font = font24, fill = 0)
+    time_draw.text((24, 0), "Some Song Name", font = font24, fill = 0)
+    
+
     num = 0
     while (True):
         time_draw.rectangle((120, 80, 220, 105), fill = 255)

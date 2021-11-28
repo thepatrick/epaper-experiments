@@ -97,8 +97,8 @@ class NowPlaying:
     duration = "{:.0f} s".format(self.play_duration) # TODO: Calculate this
 
     (_, font_artist_height) = self.font_artist.getsize(self.artist)
-    (track_duration_width, _) = self.font_title.getsize_multiline(self.title)
-    (_, track_duration_height) = self.font_duration.getsize(duration)
+    # (_, track_title_height) = self.font_title.getsize_multiline(self.title)
+    (track_duration_width, track_duration_height) = self.font_duration.getsize(duration)
 
     # self.time_image.
     # draw.rectangle((100, 100, 300, 150), fill=(0, 0, 0, 0))
@@ -132,8 +132,21 @@ class NowPlaying:
     progress_padding = 2
     available_width = self.epd.height - (self.progress_left + (progress_padding * 2) + 1)
 
+    progress_right = self.progress_left + 2 + ((self.play_position / self.play_duration) * available_width)
+
     # TODO: if less than previous, we need to draw a rectangle with fill=255 to clear it
-    self.time_draw.rectangle((self.progress_left + 2, self.epd.width - 18, self.progress_left + 2 + ((self.play_position / self.play_duration) * available_width), self.epd.width - 3), fill = 0)
+    self.time_draw.rectangle((self.progress_left + 2, self.epd.width - 18, progress_right, self.epd.width - 3), fill = 0)
+
+    if ((self.epd.height - (1 + progress_padding)) - progress_right) > 0:
+      logging.debug("filling empty space")
+      self.time_draw.rectangle((
+        progress_right,
+        self.epd.width - 18,
+        self.epd.height - (1 + progress_padding),
+        self.epd.width - 3
+      ), fill = 255)
+    else:
+      logging.debug("no empty space to fill")
 
     logging.debug("next tick...")
     self.epd.displayPartial(self.epd.getbuffer(self.time_image))

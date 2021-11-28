@@ -72,6 +72,11 @@ try:
   # receive state updates in your callback
   roonapi.register_state_callback(my_state_callback)
   update_ui()
+
+  logging.info("Begin sleep")
+
+  while True:
+    time.sleep(500)
         
 except IOError as e:
     logging.info(e)
@@ -84,8 +89,6 @@ except KeyboardInterrupt:
 # zones_seek_changed
 # zones_changed
 
-logging.info("Begin sleep")
-time.sleep(500)
 logging.info("End sleep")
 
 # 'display_name': 'Schiit', 

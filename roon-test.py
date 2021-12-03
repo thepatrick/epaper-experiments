@@ -88,7 +88,7 @@ try:
   roonapi.register_state_callback(my_state_callback)
   update_ui()
 
-  LOGGER.info("Begin sleep")
+  LOGGER.info("Ready for work")
 
   while True:
     time.sleep(500)

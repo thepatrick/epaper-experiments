@@ -6,9 +6,6 @@ os.path.realpath
 
 picdir = os.path.normpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'pic'))
 
-def roboto_mono(style: str, size: int):
-  return ImageFont.truetype(os.path.join(picdir, 'Roboto_Mono', 'static', 'RobotoMono-' + style + '.ttf'), size)
-
 def roboto(style: str, size: int):
   return ImageFont.truetype(os.path.join(picdir, 'Roboto', 'Roboto-' + style + '.ttf'), size)
 

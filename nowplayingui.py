@@ -35,7 +35,6 @@ class NowPlayingUI:
 
     self.font_artist = fonts.roboto("Regular", 20) # roboto_font("Thin", 24)
     self.font_title = fonts.roboto("Medium", 24)
-    self.font_length = fonts.roboto_mono("Light", 24)
     self.font_duration = fonts.space_mono("Bold", 16)
 
     # Drawing on the image

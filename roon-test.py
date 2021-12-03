@@ -1,50 +1,64 @@
+import os
 import time
-
 import logging
 from roonapi import RoonApi
-import nowplaying
 
-logging.basicConfig(level=logging.DEBUG)
+from appinfo import AppInfo
+from nowplayingui import NowPlayingUI
 
-appinfo = {
-    "extension_id": "io.thepatrick.epaper-experiments",
-    "display_name": "e-paper experiments",
-    "display_version": "1.0.0",
-    "publisher": "thepatrick",
-    "email": "noreply@github.com"
-}
+log_level = os.environ.get('LOG_LEVEL', 'info')
+
+token_path = os.environ['ROON_TOKEN_PATH']
+server = os.environ['ROON_CORE']
+my_zone_id = os.environ['ROON_ZONE_ID']
+LOG_FORMAT = logging.Formatter(
+    "%(asctime)-15s %(levelname)-5s  %(module)s -- %(message)s"
+)
+LOGGER = logging.getLogger(__name__)
+CONSOLE_HANDLER = logging.StreamHandler()
+CONSOLE_HANDLER.setFormatter(LOG_FORMAT)
+LOGGER.addHandler(CONSOLE_HANDLER)
+
+if log_level == 'debug':
+  LOGGER.setLevel(logging.DEBUG)
+else:
+  LOGGER.setLevel(logging.INFO)
 
 # Can be None if you don't yet have a token
-token = open("mytokenfile").read()
+try:
+  token = open(token_path).read()
+except IOError as e:
+  LOGGER.warn("Unable to read %s, will attempt to recreate %s", token_path, e)
+  token = None
 
-# Take a look at examples/discovery if you want to use discovery.
-server = "10.2.8.10"
 
-logging.info("Create RoonApi...")
-roonapi = RoonApi(appinfo, token, server)
-logging.info("...created.")
+LOGGER.debug("Create RoonApi...")
+roonapi = RoonApi(AppInfo, token, server)
+LOGGER.debug("...created.")
 
-logging.info("Write token")
-# save the token for next time
-with open("mytokenfile", "w") as f:
-    f.write(roonapi.token)
-logging.info("Token written")
+LOGGER.debug("Write token")
+
+if roonapi.token != token:
+  # save the token for next time
+  with open(token_path, "w") as f:
+      f.write(roonapi.token)
+  LOGGER.info("Token written to %s", token_path)
+else:
+  LOGGER.debug("Token unchanged, not writing again")
 
 try:
-  logging.info("NowPlaying()")
-  ui = nowplaying.NowPlaying()
+  LOGGER.info("NowPlaying()")
+  ui = NowPlayingUI(LOGGER.getChild("NowPlaying"))
 
-  logging.info("start...")
+  LOGGER.info("start...")
   ui.start()
-
-  my_zone_id = "1601943ba14655923bde8b7420e02f14b13f"
 
   def update_ui():
       zone = roonapi.zones[my_zone_id]
       track = zone['now_playing']['two_line']['line1']
       artist = zone['now_playing']['two_line']['line2']
 
-      logging.info(zone)
+      LOGGER.debug(zone)
 
       if "seek_position" in zone:
         pos = zone['seek_position']
@@ -58,13 +72,14 @@ try:
       else:
         progress = "{:.1f}%".format(((pos / length) * 100))
 
-      logging.info("[%s (%s)] %s: %s %s" % (zone['display_name'], zone['state'], artist, track, progress))
+
+      LOGGER.debug("[%s (%s)] %s: %s %s" % (zone['display_name'], zone['state'], artist, track, progress))
 
       ui.update_ui(artist, track, pos, length)
 
   def my_state_callback(event, changed_ids):
     """Call when something changes in roon."""
-    print("my_state_callback event:%s changed_ids: %s" % (event, changed_ids))
+    LOGGER.debug("my_state_callback event:%s changed_ids: %s", event, changed_ids)
     for zone_id in changed_ids:
       if zone_id == my_zone_id:
         update_ui()
@@ -73,13 +88,13 @@ try:
   roonapi.register_state_callback(my_state_callback)
   update_ui()
 
-  logging.info("Begin sleep")
+  LOGGER.info("Begin sleep")
 
   while True:
     time.sleep(500)
         
 except IOError as e:
-    logging.info(e)
+    LOGGER.info(e)
     
 except KeyboardInterrupt:
     ui.sleep()
@@ -89,7 +104,7 @@ except KeyboardInterrupt:
 # zones_seek_changed
 # zones_changed
 
-logging.info("End sleep")
+LOGGER.info("End sleep")
 
 # 'display_name': 'Schiit', 
 # 'state': 'playing',

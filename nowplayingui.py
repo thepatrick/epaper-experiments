@@ -14,11 +14,24 @@ from helpers import fonts
 from PIL import Image,ImageDraw
 from threading import Thread
 
-logger = logging.getLogger(__name__)
+def format_duration(duration: int):
+  mm, ss = divmod(duration, 60)
+  hh, mm = divmod(mm, 60)
 
-class NowPlaying:
-  def __init__(self):
+  if hh > 0:
+    s = "%d:%02d:%02d" % (hh, mm, ss)
+  elif mm > 0:
+    s = "%d:%02d" % (mm, ss)
+  else:
+    s = "%d" % ss
+
+  return s
+
+class NowPlayingUI:
+  def __init__(self, logger: logging.Logger):
     self.epd = epd2in13_V2.EPD()
+
+    self.logger = logger
 
     self.font_artist = fonts.roboto("Regular", 20) # roboto_font("Thin", 24)
     self.font_title = fonts.roboto("Medium", 24)
@@ -83,18 +96,18 @@ class NowPlaying:
         self.render_progress()
         self.needs_partial_refresh = False
       if self.needs_sleep:
-        logging.info("Goto Sleep...")
+        self.logger.info("Goto Sleep...")
         self.epd.sleep()
         self.needs_sleep = False
       time.sleep(0.5)
         
   def perform_reset(self):
-    logging.info("init and Clear")
+    self.logger.debug("init and clear")
     self.epd.init(self.epd.FULL_UPDATE)
     self.epd.Clear(0xFF)
     
   def render_everything(self):
-    duration = "{:.0f} s".format(self.play_duration) # TODO: Calculate this
+    duration = format_duration(self.play_duration)
 
     (_, font_artist_height) = self.font_artist.getsize(self.artist)
     # (_, track_title_height) = self.font_title.getsize_multiline(self.title)
@@ -138,7 +151,7 @@ class NowPlaying:
     self.time_draw.rectangle((self.progress_left + 2, self.epd.width - 18, progress_right, self.epd.width - 3), fill = 0)
 
     if ((self.epd.height - (1 + progress_padding)) - progress_right) > 0:
-      logging.debug("filling empty space")
+      self.logger.debug("filling empty space")
       self.time_draw.rectangle((
         progress_right,
         self.epd.width - 18,
@@ -146,11 +159,11 @@ class NowPlaying:
         self.epd.width - 3
       ), fill = 255)
     else:
-      logging.debug("no empty space to fill")
+      self.logger.debug("no empty space to fill")
 
-    logging.debug("next tick...")
+    self.logger.debug("next tick...")
     self.epd.displayPartial(self.epd.getbuffer(self.time_image))
   
   def ctrl_c(self):
-    logging.info("ctrl + c:")
+    self.logger.info("ctrl + c:")
     epd2in13_V2.epdconfig.module_exit()

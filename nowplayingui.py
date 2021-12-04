@@ -33,8 +33,8 @@ class NowPlayingUI:
 
     self.logger = logger
 
-    self.font_artist = fonts.roboto("Regular", 20) # roboto_font("Thin", 24)
-    self.font_title = fonts.roboto("Medium", 24)
+    self.font_artist = fonts.space_mono("Bold", 16)
+    self.font_title = fonts.space_mono("Bold", 20)
     self.font_duration = fonts.space_mono("Bold", 16)
 
     # Drawing on the image
@@ -112,8 +112,6 @@ class NowPlayingUI:
     # (_, track_title_height) = self.font_title.getsize_multiline(self.title)
     (track_duration_width, track_duration_height) = self.font_duration.getsize(duration)
 
-    # self.time_image.
-    # draw.rectangle((100, 100, 300, 150), fill=(0, 0, 0, 0))
     self.time_draw.rectangle((0, 0, self.epd.height, self.epd.width), fill = 255)
 
     # Track Artist

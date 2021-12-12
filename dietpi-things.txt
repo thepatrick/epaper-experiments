@@ -1,0 +1,6 @@
+/home/dietpi/waveshare/epaper-experiments
+
+
+/var/lib/dietpi/dietpi-autostart/custom.sh
+
+journalctl -u dietpi-autostart_custom
